@@ -1,1 +1,173 @@
 @import "tailwindcss";
+/* ─────────────────────────────────────────────────────────────────────────────
+   INDEX.CSS — Warm Slate + Teal design system
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap");
+
+:root {
+    /* Primary — warm steel blue (readable, not harsh) */
+    --gov-navy: #2D5282;
+    --gov-navy-dark: #1E3A5F;
+    --gov-navy-light: #3D6BA0;
+
+    /* Sidebar — warm dark slate (not cold navy) */
+    --gov-sidebar-bg: #1E2D3D;
+
+    /* Teal accent */
+    --gov-teal: #0D7377;
+    --gov-teal-light: #14A5A0;
+
+    /* Amber — replaces harsh orange */
+    --gov-saffron: #C2720C;
+    --gov-saffron-light: #E08C1A;
+
+    /* Green */
+    --gov-green: #276749;
+    --gov-green-light: #2E8B5A;
+
+    /* Neutrals */
+    --gov-white: #ffffff;
+    --gov-light-bg: #EEF2F7;
+    --gov-border: #D6DEE9;
+    --gov-text: #1C2B3A;
+    --gov-text-muted: #5D708A;
+
+    /* Score colours */
+    --score-green-bg: #D1FAE5;
+    --score-green-text: #065F46;
+    --score-green-border: #34D399;
+    --score-amber-bg: #FEF3C7;
+    --score-amber-text: #78350F;
+    --score-amber-border: #FCD34D;
+    --score-red-bg: #FCE7F3;
+    --score-red-text: #831843;
+    --score-red-border: #F472B6;
+
+    /* Category badge colours */
+    --cat-green-bg: #D1FAE5;
+    --cat-green-text: #065F46;
+    --cat-amber-bg: #FEF3C7;
+    --cat-amber-text: #78350F;
+    --cat-blue-bg: #DBEAFE;
+    --cat-blue-text: #1E3A8A;
+    --cat-orange-bg: #FFEDD5;
+    --cat-orange-text: #7C2D12;
+    --cat-red-bg: #FCE7F3;
+    --cat-red-text: #831843;
+
+    /* Layout */
+    --sidebar-width: 240px;
+    --header-height: 60px;
+    --radius: 6px;
+    --shadow: 0 1px 4px rgba(30, 45, 61, 0.09);
+    --shadow-md: 0 2px 12px rgba(30, 45, 61, 0.13);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    font-family: "Noto Sans", sans-serif;
+    background: var(--gov-light-bg);
+    color: var(--gov-text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gov-border);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gov-navy-light);
+}
+
+.score-green {
+    background: var(--score-green-bg);
+    color: var(--score-green-text);
+    border: 1px solid var(--score-green-border);
+}
+
+.score-amber {
+    background: var(--score-amber-bg);
+    color: var(--score-amber-text);
+    border: 1px solid var(--score-amber-border);
+}
+
+.score-red {
+    background: var(--score-red-bg);
+    color: var(--score-red-text);
+    border: 1px solid var(--score-red-border);
+}
+
+.cat-green {
+    background: var(--cat-green-bg);
+    color: var(--cat-green-text);
+}
+
+.cat-amber {
+    background: var(--cat-amber-bg);
+    color: var(--cat-amber-text);
+}
+
+.cat-blue {
+    background: var(--cat-blue-bg);
+    color: var(--cat-blue-text);
+}
+
+.cat-orange {
+    background: var(--cat-orange-bg);
+    color: var(--cat-orange-text);
+}
+
+.cat-red {
+    background: var(--cat-red-bg);
+    color: var(--cat-red-text);
+}
+
+.lang-kn {
+    background: #EDE9FE;
+    color: #4C1D95;
+    border: 1px solid #C4B5FD;
+}
+
+.lang-hi {
+    background: #FFF7ED;
+    color: #7C2D12;
+    border: 1px solid #FDBA74;
+}
+
+.lang-en {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #6EE7B7;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}

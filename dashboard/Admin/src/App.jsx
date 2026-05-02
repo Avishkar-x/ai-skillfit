@@ -1,19 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-// import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./components/layout/Layout";
+import CandidateList from "./pages/CandidateList";
+import CandidateDetail from "./pages/CandidateDetail";
+import StatsPanel from "./pages/StatsPanel";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-   <>
-   <div className='h-20 bg-amber-400'>
-    Basic setup to Start
-   </div>
-   </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<CandidateList />} />
+          <Route path="candidate/:id" element={<CandidateDetail />} />
+          <Route path="stats" element={<StatsPanel />} />
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App
