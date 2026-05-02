@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Candidate, Answer, IntegrityFlag, Summary
+from services.integrity import check_integrity
 
 router = APIRouter()
 
@@ -156,28 +157,22 @@ def register_candidate(data: CandidateRegister, db: Session = Depends(get_db)):
 @router.post("/submit")
 def submit_answer(data: AnswerSubmit, db: Session = Depends(get_db)):
 
-    # --- DEMO HACK: flag on Q2 first attempt only ---
-    existing_q2 = db.query(Answer).filter(
-        Answer.candidate_id == data.candidate_id,
-        Answer.question_id  == 2
-    ).count()
+    integrity_result = check_integrity(data.keyframe_b64)
+    flag_raised      = integrity_result["flag_raised"]
+    flag_type        = integrity_result["flag_type"]
 
-    # DEMO ONLY: Hardcoded integrity flag on Q2 first attempt
-    # to demonstrate fraud detection flow in demo video
-    # Replace with real MediaPipe + ArcFace check in production
-    if data.question_id == 2 and existing_q2 == 0:
+    if flag_raised:
         db.add(IntegrityFlag(
             candidate_id = data.candidate_id,
-            flag_type    = "multiple_faces"
+            flag_type    = flag_type
         ))
         db.commit()
         return {
             "status":         "received",
-            "question_id":    2,
+            "question_id":    data.question_id,
             "integrity_flag": True,
-            "flag_type":      "multiple_faces"
+            "flag_type":      flag_type
         }
-
     # PLACEHOLDER: Replace with Person 1's assess() function
     # when STT pipeline is integrated
     # Expected return: {transcript, relevance, completeness, clarity}
