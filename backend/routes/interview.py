@@ -40,6 +40,11 @@ class AnswerSubmit(BaseModel):
 # -----------------------------
 # Questions Data
 # -----------------------------
+
+# NOTE:DEMO ONLY
+# Questions are currently hardcoded for demo stability and faster iteration.
+# In production, these will be dynamically fetched from a database or question service,
+# enabling role-specific, multilingual, and configurable interview flows.
 QUESTIONS = {
     "kn": [
         {
@@ -94,6 +99,9 @@ QUESTIONS = {
     ]
 }
 
+# DEMO ONLY: Pre-generated summaries served from memory
+# Production: Mistral 7B generates from structured English inputs
+# Raw transcripts are never passed to Mistral
 SUMMARIES = {
     "Job Ready":          "Candidate demonstrated strong understanding across all questions. Recommended for immediate placement.",
     "Needs Training":     "Candidate showed basic understanding but needs upskilling before placement.",
@@ -154,6 +162,9 @@ def submit_answer(data: AnswerSubmit, db: Session = Depends(get_db)):
         Answer.question_id  == 2
     ).count()
 
+    # DEMO ONLY: Hardcoded integrity flag on Q2 first attempt
+    # to demonstrate fraud detection flow in demo video
+    # Replace with real MediaPipe + ArcFace check in production
     if data.question_id == 2 and existing_q2 == 0:
         db.add(IntegrityFlag(
             candidate_id = data.candidate_id,
@@ -167,7 +178,9 @@ def submit_answer(data: AnswerSubmit, db: Session = Depends(get_db)):
             "flag_type":      "multiple_faces"
         }
 
-    # --- Placeholder: Person 1 assess() plugs in here ---
+    # PLACEHOLDER: Replace with Person 1's assess() function
+    # when STT pipeline is integrated
+    # Expected return: {transcript, relevance, completeness, clarity}
     result = {
         "transcript":   "Mock transcript — Person 1 pending",
         "relevance":    7.5,
