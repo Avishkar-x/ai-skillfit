@@ -4,8 +4,17 @@ from sqlalchemy import func
 from database import SessionLocal
 from models import Candidate, Answer, IntegrityFlag, Summary
 
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # -----------------------------
 # DB Dependency
@@ -101,3 +110,5 @@ def get_candidate_detail(candidate_id: str, db: Session = Depends(get_db)):
 
         "overall_summary": summary.overall_summary if summary else None
     }
+from routes.interview import router as interview_router
+app.include_router(interview_router)
