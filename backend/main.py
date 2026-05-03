@@ -62,9 +62,16 @@ def get_candidates(
             "name": c.name,
             "district": c.district,
             "trade": c.trade,
-            "score": c.final_score,
-            "confidence": c.confidence_score,
-            "category": c.fitment_category
+            "language": c.language,
+            "final_score": c.final_score,
+            "confidence_score": c.confidence_score,
+            "fitment_category": c.fitment_category,
+            "integrity_flags": [
+                {"flag_type": f.flag_type}
+                for f in db.query(IntegrityFlag)
+                .filter(IntegrityFlag.candidate_id == c.id)
+                .all()
+            ]
         }
         for c in candidates
     ]
@@ -90,23 +97,26 @@ def get_candidate_detail(candidate_id: str, db: Session = Depends(get_db)):
         "district": candidate.district,
         "trade": candidate.trade,
         "language": candidate.language,
-        "score": candidate.final_score,
-        "confidence": candidate.confidence_score,
-        "category": candidate.fitment_category,
+        "final_score": candidate.final_score,
+        "confidence_score": candidate.confidence_score,
+        "fitment_category": candidate.fitment_category,
 
         "answers": [
             {
                 "question_id": a.question_id,
                 "transcript": a.transcript,
-                "relevance": a.relevance_score,
-                "completeness": a.completeness_score,
-                "clarity": a.clarity_score,
-                "summary": a.per_question_summary
+                "relevance_score": a.relevance_score,
+                "completeness_score": a.completeness_score,
+                "clarity_score": a.clarity_score,
+                "per_question_summary": a.per_question_summary
             }
             for a in answers
         ],
 
-        "flags": [f.flag_type for f in flags],
+        "integrity_flags": [
+            {"flag_type": f.flag_type}
+            for f in flags
+        ],
 
         "overall_summary": summary.overall_summary if summary else None
     }

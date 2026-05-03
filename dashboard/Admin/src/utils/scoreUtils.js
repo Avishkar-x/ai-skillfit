@@ -27,6 +27,7 @@ export function getCategoryColor(category) {
 
 export function getLanguageLabel(code) {
     const map = { kn: "KN", hi: "HI", en: "EN" };
+    if (!code) return "N/A";
     return map[code] || code.toUpperCase();
 }
 

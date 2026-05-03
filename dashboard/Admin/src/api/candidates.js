@@ -5,7 +5,7 @@
 
 import { MOCK_CANDIDATES, MOCK_CANDIDATE_DETAILS } from "../data/mockData";
 
-const USE_MOCK = true; // ← flip to false when DB is connected
+const USE_MOCK = false; // ← flip to false when DB is connected
 const BASE_URL = "http://localhost:8000"; // ← update to your backend URL
 
 // ── Helper ────────────────────────────────────────────────────────────────────
