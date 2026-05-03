@@ -4,7 +4,10 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Candidate, Answer, IntegrityFlag, Summary
 from services.integrity import check_integrity
-
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../stt-assesment'))
+from assess import assess as stt_assess
 router = APIRouter()
 
 
@@ -173,15 +176,19 @@ def submit_answer(data: AnswerSubmit, db: Session = Depends(get_db)):
             "integrity_flag": True,
             "flag_type":      flag_type
         }
-    # PLACEHOLDER: Replace with Person 1's assess() function
-    # when STT pipeline is integrated
-    # Expected return: {transcript, relevance, completeness, clarity}
-    result = {
-        "transcript":   "Mock transcript — Person 1 pending",
-        "relevance":    7.5,
-        "completeness": 6.8,
-        "clarity":      7.2
-    }
+    
+    # Fetch candidate trade for keyword matching
+    candidate = db.query(Candidate).filter(
+        Candidate.id == data.candidate_id
+    ).first()
+
+    # STT + Scoring via stt/assess.py
+    result = stt_assess(
+        data.audio_b64,
+        data.language,
+        data.question_id,
+        candidate.trade
+    )
 
     # --- Per question template summary ---
     rel_label  = "relevant"  if result["relevance"]    >= 5 else "not relevant"
