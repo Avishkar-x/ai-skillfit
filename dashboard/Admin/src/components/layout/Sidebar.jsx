@@ -15,8 +15,8 @@ export default function Sidebar() {
                     <LayoutDashboard size={18} color="#fff" />
                 </div>
                 <div>
-                    <div style={styles.brandTitle}>Skill India</div>
-                    <div style={styles.brandSub}>Assessment Portal</div>
+                    <div style={styles.brandTitle}>SkillFit</div>
+                    <div style={styles.brandSub}>Candidate Assessment System</div>
                 </div>
             </div>
 
@@ -45,7 +45,7 @@ export default function Sidebar() {
                 <div style={styles.footerDot} />
                 <div>
                     <div style={styles.footerText}>Government of Karnataka</div>
-                    <div style={styles.footerSub}>Ministry of Skill Development</div>
+                    <div style={styles.footerSub}>Directorate of Electronic Delivery of Citizen Services (EDCS)</div>
                 </div>
             </div>
         </aside>
@@ -136,14 +136,14 @@ const styles = {
     },
     footerText: {
         fontSize: 10,
-        color: "rgba(255,255,255,0.38)",
+        color: "rgba(255,255,255,0.75)",
         fontWeight: 600,
         letterSpacing: "0.04em",
         textTransform: "uppercase",
     },
     footerSub: {
         fontSize: 9,
-        color: "rgba(255,255,255,0.22)",
+        color: "rgba(255,255,255,0.6)",
         marginTop: 2,
     },
 };
