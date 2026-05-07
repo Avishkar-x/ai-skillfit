@@ -16,3 +16,6 @@ venv/
 
 # Logs
 *.log
+
+# Media uploads
+backend/media/

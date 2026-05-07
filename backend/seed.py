@@ -1,9 +1,67 @@
 import uuid
 import random
 from database import SessionLocal, engine
-from models import Base, Candidate, Answer, IntegrityFlag, Summary
+from models import Base, Candidate, Answer, IntegrityFlag, Summary, Question
 
 Base.metadata.create_all(bind=engine)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# QUESTION DATA — trade-specific + general fallback
+# ─────────────────────────────────────────────────────────────────────────────
+QUESTIONS_DATA = [
+    # ─── General (fallback for any trade) ───
+    {"question_id": 1, "language": "en", "trade": "general", "text": "What is your work experience?", "acknowledgement": "Thank you for sharing your experience."},
+    {"question_id": 2, "language": "en", "trade": "general", "text": "What tools do you use in your work?", "acknowledgement": "Thank you for describing your tools."},
+    {"question_id": 3, "language": "en", "trade": "general", "text": "What do you know about safety?", "acknowledgement": "Thank you for your safety awareness."},
+
+    {"question_id": 1, "language": "kn", "trade": "general", "text": "ನಿಮ್ಮ ಕೆಲಸದ ಅನುಭವ ಏನು?", "acknowledgement": "ನಿಮ್ಮ ಅನುಭವ ಹಂಚಿಕೊಂಡಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದ."},
+    {"question_id": 2, "language": "kn", "trade": "general", "text": "ನೀವು ಯಾವ ಉಪಕರಣಗಳನ್ನು ಬಳಸುತ್ತೀರಿ?", "acknowledgement": "ನಿಮ್ಮ ಉಪಕರಣಗಳ ಬಗ್ಗೆ ಧನ್ಯವಾದ."},
+    {"question_id": 3, "language": "kn", "trade": "general", "text": "ಸುರಕ್ಷತೆ ಬಗ್ಗೆ ನಿಮಗೆ ಏನು ಗೊತ್ತು?", "acknowledgement": "ಸುರಕ್ಷತೆ ಬಗ್ಗೆ ಧನ್ಯವಾದ."},
+
+    {"question_id": 1, "language": "hi", "trade": "general", "text": "आपका काम का अनुभव क्या है?", "acknowledgement": "आपके अनुभव के लिए धन्यवाद।"},
+    {"question_id": 2, "language": "hi", "trade": "general", "text": "आप कौन से उपकरण उपयोग करते हैं?", "acknowledgement": "उपकरण बताने के लिए धन्यवाद।"},
+    {"question_id": 3, "language": "hi", "trade": "general", "text": "सुरक्षा के बारे में आप क्या जानते हैं?", "acknowledgement": "सुरक्षा जागरूकता के लिए धन्यवाद।"},
+
+    # ─── Electrician ───
+    {"question_id": 1, "language": "en", "trade": "Electrician", "text": "Explain how you would wire a 3-phase electrical panel.", "acknowledgement": "Thank you for your technical explanation."},
+    {"question_id": 2, "language": "en", "trade": "Electrician", "text": "What safety precautions do you take when working with live wires?", "acknowledgement": "Thank you for sharing your safety practices."},
+    {"question_id": 3, "language": "en", "trade": "Electrician", "text": "How do you troubleshoot a circuit that keeps tripping the breaker?", "acknowledgement": "Thank you for your troubleshooting approach."},
+
+    {"question_id": 1, "language": "kn", "trade": "Electrician", "text": "3-ಫೇಸ್ ವಿದ್ಯುತ್ ಪ್ಯಾನೆಲ್ ಅನ್ನು ಹೇಗೆ ವೈರ್ ಮಾಡುತ್ತೀರಿ ಎಂದು ವಿವರಿಸಿ.", "acknowledgement": "ನಿಮ್ಮ ತಾಂತ್ರಿಕ ವಿವರಣೆಗೆ ಧನ್ಯವಾದ."},
+    {"question_id": 2, "language": "kn", "trade": "Electrician", "text": "ಲೈವ್ ವೈರ್‌ಗಳೊಂದಿಗೆ ಕೆಲಸ ಮಾಡುವಾಗ ಯಾವ ಸುರಕ್ಷತಾ ಕ್ರಮಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳುತ್ತೀರಿ?", "acknowledgement": "ಸುರಕ್ಷತಾ ಅಭ್ಯಾಸಗಳಿಗೆ ಧನ್ಯವಾದ."},
+    {"question_id": 3, "language": "kn", "trade": "Electrician", "text": "ಬ್ರೇಕರ್ ಮತ್ತೆ ಮತ್ತೆ ಟ್ರಿಪ್ ಆಗುತ್ತಿದ್ದರೆ ಸರ್ಕ್ಯೂಟ್ ಅನ್ನು ಹೇಗೆ ಟ್ರಬಲ್‌ಶೂಟ್ ಮಾಡುತ್ತೀರಿ?", "acknowledgement": "ಟ್ರಬಲ್‌ಶೂಟಿಂಗ್ ವಿಧಾನಕ್ಕೆ ಧನ್ಯವಾದ."},
+
+    {"question_id": 1, "language": "hi", "trade": "Electrician", "text": "3-फेज इलेक्ट्रिकल पैनल को कैसे वायर करेंगे, समझाइए।", "acknowledgement": "आपकी तकनीकी व्याख्या के लिए धन्यवाद।"},
+    {"question_id": 2, "language": "hi", "trade": "Electrician", "text": "लाइव तारों के साथ काम करते समय आप क्या सुरक्षा सावधानियां बरतते हैं?", "acknowledgement": "सुरक्षा अभ्यास बताने के लिए धन्यवाद।"},
+    {"question_id": 3, "language": "hi", "trade": "Electrician", "text": "अगर ब्रेकर बार-बार ट्रिप हो रहा है तो सर्किट की समस्या कैसे ढूंढेंगे?", "acknowledgement": "समस्या निवारण दृष्टिकोण के लिए धन्यवाद।"},
+
+    # ─── Plumber ───
+    {"question_id": 1, "language": "en", "trade": "Plumber", "text": "Describe the steps to fix a leaking pipe joint.", "acknowledgement": "Thank you for your explanation."},
+    {"question_id": 2, "language": "en", "trade": "Plumber", "text": "What tools and fittings do you use for PVC and GI pipe work?", "acknowledgement": "Thank you for describing your toolkit."},
+    {"question_id": 3, "language": "en", "trade": "Plumber", "text": "How do you ensure proper water pressure in a multi-story building?", "acknowledgement": "Thank you for your technical knowledge."},
+
+    {"question_id": 1, "language": "kn", "trade": "Plumber", "text": "ಸೋರುತ್ತಿರುವ ಪೈಪ್ ಜಾಯಿಂಟ್ ಅನ್ನು ಸರಿಪಡಿಸುವ ಹಂತಗಳನ್ನು ವಿವರಿಸಿ.", "acknowledgement": "ನಿಮ್ಮ ವಿವರಣೆಗೆ ಧನ್ಯವಾದ."},
+    {"question_id": 2, "language": "kn", "trade": "Plumber", "text": "PVC ಮತ್ತು GI ಪೈಪ್ ಕೆಲಸಕ್ಕೆ ಯಾವ ಉಪಕರಣಗಳು ಮತ್ತು ಫಿಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಬಳಸುತ್ತೀರಿ?", "acknowledgement": "ನಿಮ್ಮ ಉಪಕರಣಗಳ ಬಗ್ಗೆ ಧನ್ಯವಾದ."},
+    {"question_id": 3, "language": "kn", "trade": "Plumber", "text": "ಬಹು ಅಂತಸ್ತಿನ ಕಟ್ಟಡದಲ್ಲಿ ಸರಿಯಾದ ನೀರಿನ ಒತ್ತಡವನ್ನು ಹೇಗೆ ಖಚಿತಪಡಿಸುತ್ತೀರಿ?", "acknowledgement": "ತಾಂತ್ರಿಕ ಜ್ಞಾನಕ್ಕೆ ಧನ್ಯವಾದ."},
+
+    {"question_id": 1, "language": "hi", "trade": "Plumber", "text": "लीक हो रहे पाइप जॉइंट को ठीक करने के चरण बताइए।", "acknowledgement": "आपकी व्याख्या के लिए धन्यवाद।"},
+    {"question_id": 2, "language": "hi", "trade": "Plumber", "text": "PVC और GI पाइप के काम के लिए कौन से उपकरण और फिटिंग उपयोग करते हैं?", "acknowledgement": "टूलकिट बताने के लिए धन्यवाद।"},
+    {"question_id": 3, "language": "hi", "trade": "Plumber", "text": "बहुमंजिला इमारत में सही पानी का दबाव कैसे सुनिश्चित करते हैं?", "acknowledgement": "तकनीकी ज्ञान के लिए धन्यवाद।"},
+
+    # ─── Welder ───
+    {"question_id": 1, "language": "en", "trade": "Welder", "text": "What types of welding have you performed and which method do you prefer?", "acknowledgement": "Thank you for sharing your welding expertise."},
+    {"question_id": 2, "language": "en", "trade": "Welder", "text": "What safety equipment is essential when performing arc welding?", "acknowledgement": "Thank you for your safety knowledge."},
+    {"question_id": 3, "language": "en", "trade": "Welder", "text": "How do you identify and fix common welding defects like porosity or undercut?", "acknowledgement": "Thank you for your quality control approach."},
+
+    {"question_id": 1, "language": "kn", "trade": "Welder", "text": "ನೀವು ಯಾವ ರೀತಿಯ ವೆಲ್ಡಿಂಗ್ ಮಾಡಿದ್ದೀರಿ ಮತ್ತು ಯಾವ ವಿಧಾನವನ್ನು ಆದ್ಯತೆ ನೀಡುತ್ತೀರಿ?", "acknowledgement": "ವೆಲ್ಡಿಂಗ್ ಪರಿಣತಿ ಹಂಚಿಕೊಂಡಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದ."},
+    {"question_id": 2, "language": "kn", "trade": "Welder", "text": "ಆರ್ಕ್ ವೆಲ್ಡಿಂಗ್ ಮಾಡುವಾಗ ಯಾವ ಸುರಕ್ಷತಾ ಸಾಧನಗಳು ಅಗತ್ಯ?", "acknowledgement": "ಸುರಕ್ಷತಾ ಜ್ಞಾನಕ್ಕೆ ಧನ್ಯವಾದ."},
+    {"question_id": 3, "language": "kn", "trade": "Welder", "text": "ಪೊರೊಸಿಟಿ ಅಥವಾ ಅಂಡರ್‌ಕಟ್ ನಂತಹ ಸಾಮಾನ್ಯ ವೆಲ್ಡಿಂಗ್ ದೋಷಗಳನ್ನು ಹೇಗೆ ಗುರುತಿಸುತ್ತೀರಿ ಮತ್ತು ಸರಿಪಡಿಸುತ್ತೀರಿ?", "acknowledgement": "ಗುಣಮಟ್ಟ ನಿಯಂತ್ರಣ ವಿಧಾನಕ್ಕೆ ಧನ್ಯವಾದ."},
+
+    {"question_id": 1, "language": "hi", "trade": "Welder", "text": "आपने किस प्रकार की वेल्डिंग की है और कौन सी विधि पसंद करते हैं?", "acknowledgement": "वेल्डिंग विशेषज्ञता के लिए धन्यवाद।"},
+    {"question_id": 2, "language": "hi", "trade": "Welder", "text": "आर्क वेल्डिंग करते समय कौन से सुरक्षा उपकरण आवश्यक हैं?", "acknowledgement": "सुरक्षा ज्ञान के लिए धन्यवाद।"},
+    {"question_id": 3, "language": "hi", "trade": "Welder", "text": "पोरोसिटी या अंडरकट जैसी सामान्य वेल्डिंग दोषों को कैसे पहचानते और ठीक करते हैं?", "acknowledgement": "गुणवत्ता नियंत्रण दृष्टिकोण के लिए धन्यवाद।"},
+]
 
 DISTRICTS = ["Bengaluru", "Mysuru", "Hubli"]
 TRADES = ["Electrician", "Plumber", "Welder"]
@@ -91,10 +149,26 @@ def per_question_summary(relevance, completeness, clarity):
     return f"Response was {rel_label} and {comp_label}. Communication was {clar_label}."
 
 
+def seed_questions(db):
+    """Seed trade-specific questions (idempotent — skips if already present)."""
+    existing = db.query(Question).count()
+    if existing > 0:
+        print(f"  Questions already seeded ({existing} found), skipping.")
+        return
+
+    for q in QUESTIONS_DATA:
+        db.add(Question(**q))
+    db.flush()
+    print(f"  Seeded {len(QUESTIONS_DATA)} questions across 4 trades × 3 languages.")
+
+
 def seed():
     db = SessionLocal()
 
     try:
+        # Seed questions first
+        seed_questions(db)
+
         candidates_created = []
 
         category_pool = (CATEGORIES * 12)[:60]

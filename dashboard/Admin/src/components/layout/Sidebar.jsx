@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { Users, BarChart2, LayoutDashboard } from "lucide-react";
+import { Users, BarChart2, LayoutDashboard, LogOut } from "lucide-react";
+import { logout } from "../../api/candidates";
 
 const NAV = [
     { to: "/", label: "Candidate List", icon: Users, end: true },
@@ -39,6 +40,14 @@ export default function Sidebar() {
                     </NavLink>
                 ))}
             </nav>
+
+            {/* Logout */}
+            <div style={{ padding: "0 8px 8px" }}>
+                <button onClick={logout} style={styles.logoutBtn}>
+                    <LogOut size={14} />
+                    <span>Sign Out</span>
+                </button>
+            </div>
 
             {/* Footer */}
             <div style={styles.sidebarFooter}>
@@ -119,6 +128,21 @@ const styles = {
         background: "var(--gov-teal)",
         color: "#fff",
         fontWeight: 600,
+    },
+    logoutBtn: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        padding: "9px 12px",
+        borderRadius: "var(--radius)",
+        color: "rgba(255,255,255,0.55)",
+        fontSize: 13,
+        fontWeight: 500,
+        background: "none",
+        border: "1px solid rgba(255,255,255,0.1)",
+        cursor: "pointer",
+        width: "100%",
+        transition: "all 0.15s ease",
     },
     sidebarFooter: {
         padding: "14px 16px",

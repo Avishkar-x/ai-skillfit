@@ -5,7 +5,9 @@ import ScoreBadge from "../components/ui/ScoreBadge";
 import CategoryBadge from "../components/ui/CategoryBadge";
 import LanguageBadge from "../components/ui/LanguageBadge";
 import { FraudBanner } from "../components/ui/FraudIcon";
-import { ArrowLeft, User, MapPin, Wrench, MessageSquare, FileText } from "lucide-react";
+import { ArrowLeft, User, MapPin, Wrench, MessageSquare, FileText, Headphones, Image } from "lucide-react";
+
+const BACKEND_URL = "http://localhost:8000";
 
 export default function CandidateDetail() {
     const { id } = useParams();
@@ -84,6 +86,8 @@ export default function CandidateDetail() {
                             <th style={{ ...s.th, textAlign: "center" }}>Completeness</th>
                             <th style={{ ...s.th, textAlign: "center" }}>Clarity</th>
                             <th style={s.th}>Summary</th>
+                            <th style={{ ...s.th, textAlign: "center" }}>Audio</th>
+                            <th style={{ ...s.th, textAlign: "center" }}>Evidence</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +113,31 @@ export default function CandidateDetail() {
                                 </td>
                                 <td style={{ ...s.td, maxWidth: 220 }}>
                                     <div style={s.summaryText}>{a.per_question_summary}</div>
+                                </td>
+                                <td style={{ ...s.td, textAlign: "center" }}>
+                                    {a.audio_url ? (
+                                        <audio controls style={s.audioPlayer}>
+                                            <source src={`${BACKEND_URL}${a.audio_url}`} type="audio/webm" />
+                                        </audio>
+                                    ) : (
+                                        <span style={s.noMedia}>—</span>
+                                    )}
+                                </td>
+                                <td style={{ ...s.td, textAlign: "center" }}>
+                                    {a.keyframe_urls && a.keyframe_urls.length > 0 ? (
+                                        <div style={s.keyframeRow}>
+                                            {a.keyframe_urls.map((url, ki) => (
+                                                <img
+                                                    key={ki}
+                                                    src={`${BACKEND_URL}${url}`}
+                                                    alt={`Frame ${ki + 1}`}
+                                                    style={s.keyframeImg}
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span style={s.noMedia}>—</span>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -332,5 +361,26 @@ const s = {
         fontSize: 13,
         lineHeight: 1.7,
         color: "var(--gov-text)",
+    },
+    audioPlayer: {
+        width: 140,
+        height: 32,
+    },
+    noMedia: {
+        fontSize: 12,
+        color: "var(--gov-text-muted)",
+    },
+    keyframeRow: {
+        display: "flex",
+        gap: 4,
+        justifyContent: "center",
+    },
+    keyframeImg: {
+        width: 48,
+        height: 36,
+        objectFit: "cover",
+        borderRadius: 4,
+        border: "1px solid var(--gov-border)",
+        cursor: "pointer",
     },
 };

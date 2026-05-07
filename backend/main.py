@@ -1,17 +1,27 @@
 from fastapi import FastAPI, Depends, Query
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import SessionLocal
 from models import Candidate, Answer, IntegrityFlag, Summary
+from services.auth import LoginRequest, authenticate, require_auth
+import json
+import os
 
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+
+# Mount media directory for serving audio/keyframes
+MEDIA_DIR = os.path.join(os.path.dirname(__file__), 'media')
+os.makedirs(MEDIA_DIR, exist_ok=True)
+app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
 
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -30,7 +40,15 @@ def get_db():
 
 
 # -----------------------------
-# CANDIDATES LIST (Dashboard)
+# AUTH — Login
+# -----------------------------
+@app.post("/login")
+def login(data: LoginRequest):
+    return authenticate(data)
+
+
+# -----------------------------
+# CANDIDATES LIST (Dashboard — Protected)
 # -----------------------------
 @app.get("/candidates")
 def get_candidates(
@@ -38,7 +56,8 @@ def get_candidates(
     trade: str = Query(None),
     language: str = Query(None),
     category: str = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _auth: dict = Depends(require_auth),
 ):
     query = db.query(Candidate)
 
@@ -78,10 +97,14 @@ def get_candidates(
 
 
 # -----------------------------
-# CANDIDATE DETAIL (Dashboard)
+# CANDIDATE DETAIL (Dashboard — Protected)
 # -----------------------------
 @app.get("/candidate/{candidate_id}")
-def get_candidate_detail(candidate_id: str, db: Session = Depends(get_db)):
+def get_candidate_detail(
+    candidate_id: str,
+    db: Session = Depends(get_db),
+    _auth: dict = Depends(require_auth),
+):
     
     candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
     if not candidate:
@@ -108,7 +131,9 @@ def get_candidate_detail(candidate_id: str, db: Session = Depends(get_db)):
                 "relevance_score": a.relevance_score,
                 "completeness_score": a.completeness_score,
                 "clarity_score": a.clarity_score,
-                "per_question_summary": a.per_question_summary
+                "per_question_summary": a.per_question_summary,
+                "audio_url": a.audio_url,
+                "keyframe_urls": json.loads(a.keyframe_urls) if a.keyframe_urls else [],
             }
             for a in answers
         ],

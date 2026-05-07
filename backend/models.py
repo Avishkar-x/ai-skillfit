@@ -29,6 +29,8 @@ class Answer(Base):
     completeness_score   = Column(Float)
     clarity_score        = Column(Float)
     per_question_summary = Column(String)
+    audio_url            = Column(String, nullable=True)
+    keyframe_urls        = Column(String, nullable=True)  # JSON-encoded list of URLs
     created_at           = Column(DateTime, server_default=func.now())
 
 
@@ -47,3 +49,14 @@ class Summary(Base):
     id              = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     candidate_id    = Column(String, ForeignKey("candidates.id"))
     overall_summary = Column(String)
+
+
+class Question(Base):
+    __tablename__ = "questions"
+
+    id              = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    question_id     = Column(Integer)          # display order (1, 2, 3)
+    language        = Column(String)           # kn, hi, en
+    trade           = Column(String)           # Electrician, Plumber, Welder, or "general"
+    text            = Column(String)
+    acknowledgement = Column(String, nullable=True)

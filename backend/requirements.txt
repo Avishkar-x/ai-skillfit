@@ -7,3 +7,9 @@ python-dotenv
 opencv-python
 numpy
 requests
+
+# LLM Summaries (Phase 3)
+google-genai
+
+# JWT Auth (Phase 4)
+PyJWT

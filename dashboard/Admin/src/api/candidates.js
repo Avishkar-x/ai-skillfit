@@ -1,16 +1,68 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// API LAYER
-// Set USE_MOCK = false and set BASE_URL when your backend is connected
+// API LAYER — with JWT Authentication
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { MOCK_CANDIDATES, MOCK_CANDIDATE_DETAILS } from "../data/mockData";
 
-const USE_MOCK = false; // ← flip to false when DB is connected
-const BASE_URL = "http://localhost:8000"; // ← update to your backend URL
+const USE_MOCK = false;
+const BASE_URL = "http://localhost:8000";
 
-// ── Helper ────────────────────────────────────────────────────────────────────
+// ── Token Management ─────────────────────────────────────────────────────────
+export function getToken() {
+    return localStorage.getItem("skillsetu_token");
+}
+
+export function setToken(token) {
+    localStorage.setItem("skillsetu_token", token);
+}
+
+export function clearToken() {
+    localStorage.removeItem("skillsetu_token");
+}
+
+export function isAuthenticated() {
+    return !!getToken();
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+export async function login(username, password) {
+    const res = await fetch(`${BASE_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Login failed");
+    }
+
+    const data = await res.json();
+    setToken(data.access_token);
+    return data;
+}
+
+export function logout() {
+    clearToken();
+    window.location.href = "/login";
+}
+
+// ── Authenticated Fetch Helper ────────────────────────────────────────────────
 async function apiFetch(path) {
-    const res = await fetch(`${BASE_URL}${path}`);
+    const token = getToken();
+    const headers = {};
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BASE_URL}${path}`, { headers });
+
+    if (res.status === 401) {
+        clearToken();
+        window.location.href = "/login";
+        throw new Error("Session expired. Please log in again.");
+    }
+
     if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
     return res.json();
 }
@@ -18,7 +70,7 @@ async function apiFetch(path) {
 // ── Candidate List ─────────────────────────────────────────────────────────────
 export async function fetchCandidates(filters = {}) {
     if (USE_MOCK) {
-        await delay(300); // simulate network
+        await delay(300);
         let data = [...MOCK_CANDIDATES];
 
         if (filters.district) data = data.filter((c) => c.district === filters.district);
@@ -29,7 +81,6 @@ export async function fetchCandidates(filters = {}) {
         return data;
     }
 
-    // Real API
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => { if (v) params.append(k, v); });
     const qs = params.toString() ? `?${params.toString()}` : "";
