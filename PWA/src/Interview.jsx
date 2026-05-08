@@ -154,6 +154,9 @@ export function InterviewScreen({
   const keyframesRef = useRef([])
   const keyframeCaptureRef = useRef(null)
   const recordingStartTimeRef = useRef(null)
+  // Always-current question ref — avoids stale closures in useCallback([], [])
+  const questionRef = useRef(question)
+  questionRef.current = question  // sync on every render
 
   const [timer, setTimer] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
@@ -256,8 +259,14 @@ export function InterviewScreen({
       // Start multi-keyframe capture immediately after video is ready
       startKeyframeCapture(videoElRef.current)
 
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
+      // Explicitly request opus codec — plain 'audio/webm' produces silent files on Chrome/Windows
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/mp4'
       mimeTypeRef.current = mimeType
+      console.log('[RECORDER] Using MIME type:', mimeType)
       const recorder = new MediaRecorder(audioStream, { mimeType })
       chunksRef.current = []
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data) }
@@ -335,7 +344,7 @@ export function InterviewScreen({
         videoStreamRef.current = null
         audioStreamRef.current = null
         setPhase(PHASES.SUBMITTING)
-        await submitAnswer(base64Audio)
+        await submitAnswer(base64Audio, questionRef.current.question_id)
       } catch {
         toast.error('Submission failed. Please try again.')
         setPhase(PHASES.SUBMIT_ERROR)
@@ -344,10 +353,10 @@ export function InterviewScreen({
     recorder.stop()
   }, [])
 
-  const submitAnswer = async (base64Audio) => {
+  const submitAnswer = async (base64Audio, qid) => {
     if (DEV_MODE) {
       await new Promise((r) => setTimeout(r, 2000))
-      const res = (question.question_id === 2 || question.question_id === 3)
+      const res = (qid === 2 || qid === 3)
         ? mockIntegrityFailResponse
         : mockSubmitResponse
       handleResult(res)
@@ -362,7 +371,7 @@ export function InterviewScreen({
         signal: controller.signal,
         body: JSON.stringify({
           candidate_id: candidateId,
-          question_id: question.question_id,
+          question_id: qid,
           language,
           audio_base64: base64Audio,
           keyframes: keyframesRef.current,

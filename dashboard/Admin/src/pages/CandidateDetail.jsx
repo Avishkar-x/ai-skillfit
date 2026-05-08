@@ -116,9 +116,7 @@ export default function CandidateDetail() {
                                 </td>
                                 <td style={{ ...s.td, textAlign: "center" }}>
                                     {a.audio_url ? (
-                                        <audio controls style={s.audioPlayer}>
-                                            <source src={`${BACKEND_URL}${a.audio_url}`} type="audio/webm" />
-                                        </audio>
+                                        <audio controls style={s.audioPlayer} src={`${BACKEND_URL}${a.audio_url}`} />
                                     ) : (
                                         <span style={s.noMedia}>—</span>
                                     )}

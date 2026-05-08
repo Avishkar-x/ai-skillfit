@@ -46,6 +46,10 @@ import { PHASES, BASE_URL, mockQuestions, mockRegisterResponse } from './constan
 import { LanguageSelect, Registration } from './Screens'
 import { LoadingQuestions, LoadingError, CompleteScreen, TerminatedScreen, InterviewScreen } from './Interview'
 
+// NOTE: DEV_MODE is a frontend-only mock toggle built for the prototype round.
+// It allows the UI flow to be demonstrated instantly without any backend dependency.
+// In the actual production release, DEV_MODE and all associated mock endpoints 
+// (mockSubmitResponse, mockQuestions) will be permanently stripped from the codebase.
 const DEV_MODE = false
 
 // Shuffle utility (Fisher-Yates) to randomize question order

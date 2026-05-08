@@ -2,11 +2,12 @@ from fastapi import FastAPI, Depends, Query
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from database import SessionLocal
+from database import SessionLocal, MOCK_MODE
 from models import Candidate, Answer, IntegrityFlag, Summary
 from services.auth import LoginRequest, authenticate, require_auth
 import json
 import os
+from mock_data import MOCK_CANDIDATES, MOCK_CANDIDATE_DETAIL
 
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
@@ -30,6 +31,10 @@ app.add_middleware(
 # DB Dependency
 # -----------------------------
 def get_db():
+    if MOCK_MODE:
+        yield None
+        return
+        
     db = SessionLocal()
     try:
         yield db
@@ -59,6 +64,9 @@ def get_candidates(
     db: Session = Depends(get_db),
     _auth: dict = Depends(require_auth),
 ):
+    if db is None:
+        return MOCK_CANDIDATES
+
     query = db.query(Candidate)
 
     if district:
@@ -105,7 +113,9 @@ def get_candidate_detail(
     db: Session = Depends(get_db),
     _auth: dict = Depends(require_auth),
 ):
-    
+    if db is None:
+        return MOCK_CANDIDATE_DETAIL.get(candidate_id, {"error": "Candidate not found in Mock Data"})
+
     candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
     if not candidate:
         return {"error": "Candidate not found"}

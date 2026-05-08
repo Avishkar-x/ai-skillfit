@@ -19,13 +19,12 @@ def decode_keyframe(keyframe_b64: str) -> np.ndarray:
 
 def detect_faces(img: np.ndarray) -> list:
     gray  = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # Equalize histogram for better detection in poor lighting
-    gray = cv2.equalizeHist(gray)
+    # Removing equalizeHist because it often boosts background noise into ghost faces
     faces = face_cascade.detectMultiScale(
         gray,
         scaleFactor  = 1.1,
-        minNeighbors = 3,   # Lowered from 5 — less strict, fewer false negatives
-        minSize      = (20, 20)  # Lowered from 30 — detect faces at greater distance
+        minNeighbors = 6,   # Increased from 3 to 6 to reduce false positives
+        minSize      = (60, 60)  # Increased from 20x20 to ensure we only catch real faces close to camera
     )
     return faces
 

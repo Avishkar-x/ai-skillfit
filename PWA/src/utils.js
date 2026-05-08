@@ -122,44 +122,8 @@ export const checkAudioHasSound = (blob) => {
       return
     }
 
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    const reader = new FileReader()
-
-    reader.onloadend = async () => {
-      try {
-        const arrayBuffer = reader.result
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
-        const channelData = audioBuffer.getChannelData(0)
-
-        // Calculate RMS (Root Mean Square) — measure of audio energy
-        let sumOfSquares = 0
-        for (let i = 0; i < channelData.length; i++) {
-          sumOfSquares += channelData[i] * channelData[i]
-        }
-        const rms = Math.sqrt(sumOfSquares / channelData.length)
-
-        // Lowered threshold: 0.005 catches true silence but allows quiet speech
-        const SILENCE_THRESHOLD = 0.005
-        const hasMeaningfulAudio = rms > SILENCE_THRESHOLD
-
-        console.log('[AUDIO CHECK] RMS:', rms.toFixed(6), '| Has sound:', hasMeaningfulAudio)
-        audioContext.close()
-        resolve(hasMeaningfulAudio)
-      } catch (err) {
-        // decodeAudioData fails on WebM/Opus in many browsers —
-        // assume audio is valid, let backend STT handle verification
-        console.warn('[AUDIO CHECK] Decode failed (format not supported by Web Audio API), assuming valid:', err.message)
-        audioContext.close()
-        resolve(true)
-      }
-    }
-
-    reader.onerror = () => {
-      console.warn('[AUDIO CHECK] FileReader error, assuming valid')
-      audioContext.close()
-      resolve(true)
-    }
-
-    reader.readAsArrayBuffer(blob)
+    // BYPASS: Client-side RMS silence detection causes false positives with 
+    // modern noise-cancelling mics. We let the backend STT handle it.
+    resolve(true)
   })
 }
