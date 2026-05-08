@@ -2,12 +2,15 @@ from fastapi import FastAPI, Depends, Query
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from database import SessionLocal, MOCK_MODE
-from models import Candidate, Answer, IntegrityFlag, Summary
+from database import SessionLocal, MOCK_MODE, engine
+from models import Candidate, Answer, IntegrityFlag, Summary, Base
 from services.auth import LoginRequest, authenticate, require_auth
 import json
 import os
 from mock_data import MOCK_CANDIDATES, MOCK_CANDIDATE_DETAIL
+
+if engine is not None:
+    Base.metadata.create_all(bind=engine)
 
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()

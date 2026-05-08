@@ -10,10 +10,8 @@ import json
 import logging
 import urllib.parse
 import urllib.request
-import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../stt-assesment'))
-from assess import assess as stt_assess
+from stt.assess import assess as stt_assess
 
 # Media storage directory
 MEDIA_DIR = os.path.join(os.path.dirname(__file__), '..', 'media')
