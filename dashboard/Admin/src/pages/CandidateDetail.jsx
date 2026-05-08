@@ -7,7 +7,7 @@ import LanguageBadge from "../components/ui/LanguageBadge";
 import { FraudBanner } from "../components/ui/FraudIcon";
 import { ArrowLeft, User, MapPin, Wrench, MessageSquare, FileText, Headphones, Image } from "lucide-react";
 
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export default function CandidateDetail() {
     const { id } = useParams();

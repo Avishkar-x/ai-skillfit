@@ -5,7 +5,7 @@
 import { MOCK_CANDIDATES, MOCK_CANDIDATE_DETAILS } from "../data/mockData";
 
 const USE_MOCK = false;
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 // ── Token Management ─────────────────────────────────────────────────────────
 export function getToken() {
