@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchCandidateById } from "../api/candidates";
 import ScoreBadge from "../components/ui/ScoreBadge";
 import CategoryBadge from "../components/ui/CategoryBadge";
-import LanguageBadge from "../components/ui/LanguageBadge";
+import LanguageBadge from "../components/ui/Languagebadge";
 import { FraudBanner } from "../components/ui/FraudIcon";
 import { ArrowLeft, User, MapPin, Wrench, MessageSquare, FileText, Headphones, Image } from "lucide-react";
 

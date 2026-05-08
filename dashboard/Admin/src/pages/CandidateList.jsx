@@ -4,7 +4,7 @@ import { fetchCandidates } from "../api/candidates";
 import { exportToCSV } from "../utils/csvExport";
 import ScoreBadge from "../components/ui/ScoreBadge";
 import CategoryBadge from "../components/ui/CategoryBadge";
-import LanguageBadge from "../components/ui/LanguageBadge";
+import LanguageBadge from "../components/ui/Languagebadge";
 import FraudIcon from "../components/ui/FraudIcon";
 import { Download, Search, RefreshCw, ChevronRight } from "lucide-react";
 
