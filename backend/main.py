@@ -64,8 +64,7 @@ def get_candidates(
     trade: str = Query(None),
     language: str = Query(None),
     category: str = Query(None),
-    db: Session = Depends(get_db),
-    _auth: dict = Depends(require_auth),
+    db: Session = Depends(get_db)
 ):
     if db is None:
         return MOCK_CANDIDATES
@@ -113,8 +112,7 @@ def get_candidates(
 @app.get("/candidate/{candidate_id}")
 def get_candidate_detail(
     candidate_id: str,
-    db: Session = Depends(get_db),
-    _auth: dict = Depends(require_auth),
+    db: Session = Depends(get_db)
 ):
     if db is None:
         return MOCK_CANDIDATE_DETAIL.get(candidate_id, {"error": "Candidate not found in Mock Data"})

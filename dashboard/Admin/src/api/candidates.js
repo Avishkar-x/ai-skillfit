@@ -57,11 +57,7 @@ async function apiFetch(path) {
 
     const res = await fetch(`${BASE_URL}${path}`, { headers });
 
-    if (res.status === 401) {
-        clearToken();
-        window.location.href = "/login";
-        throw new Error("Session expired. Please log in again.");
-    }
+
 
     if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
     return res.json();
