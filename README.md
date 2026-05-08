@@ -302,4 +302,7 @@ http://localhost:5173
 
 # Team
 
-Add team member details here.
+Avishkar Mali  [GitHub](https://github.com/Avishkar-x)
+Harshal Rajput  [GitHub](https://github.com/harshalrajputt)
+Jay Matere  [GitHub](https://github.com/jaymatere08)
+Avishkar Mali  [GitHub](https://github.com/tanish-mazire)
